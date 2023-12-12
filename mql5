@@ -1,0 +1,157 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                   Take a Break Indicator MT5 |
+//|                                           https://forexroboteasy.com |
+//|                                                          Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+#property indicator_chart_window
+#property indicator_buffers 1
+#property indicator_color1 Lime
+
+// Define the maximum number of EAs that can be managed
+#define MAX_EAS 10
+
+// Define the structure to store EA settings
+struct EA_Settings
+{
+   string EA_Name;
+   int Chart_Group;
+};
+
+// Define the array to store the EA settings
+EA_Settings eaSettings[MAX_EAS];
+
+// Define the array to store the corresponding Chart Group for each EA
+int chartGroup[MAX_EAS];
+
+// Define the array to store the magic numbers of all trades
+int magicNumbers[];
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Attach the indicator to each chart
+   for(int i = 0; i < ChartObjectsTotal(); i++)
+   {
+      if(ObjectType(ObjectName(i)) == OBJ_PERIOD)
+      {
+         string symbol = ObjectGetString(i, OBJPROP_SYMBOL);
+         int chartGroupIndex = GetChartGroupIndex(symbol);
+         AttachEA(symbol, chartGroupIndex);
+      }
+   }
+   
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Detach all EAs from their charts
+   for(int i = 0; i < ArraySize(eaSettings); i++)
+   {
+      string symbol = eaSettings[i].EA_Name;
+      int chartGroupIndex = eaSettings[i].Chart_Group;
+      DetachEA(symbol, chartGroupIndex);
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   // Perform management of all trades in the Forex market
+   ManageTrades();
+   
+   return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Function to manage all trades in the Forex market                 |
+//+------------------------------------------------------------------+
+void ManageTrades()
+{
+   // Get all open trades
+   int total = PositionsTotal();
+   
+   for(int i = 0; i < total; i++)
+   {
+      // Check if the magic number is in the magicNumbers array
+      int magic = PositionGetInteger(POSITION_MAGIC);
+      
+      if(IsMagicNumberExists(magic))
+      {
+         // Perform necessary operations on the trade
+         // ...
+      }
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Function to check if the magic number exists in the magicNumbers array |
+//+------------------------------------------------------------------+
+bool IsMagicNumberExists(const int magic)
+{
+   for(int i = 0; i < ArraySize(magicNumbers); i++)
+   {
+      if(magicNumbers[i] == magic)
+         return true;
+   }
+   
+   return false;
+}
+
+//+------------------------------------------------------------------+
+//| Function to attach the EA to the chart                            |
+//+------------------------------------------------------------------+
+void AttachEA(const string symbol, const int chartGroupIndex)
+{
+   // Add the EA settings to the array
+   EA_Settings setting;
+   setting.EA_Name = symbol;
+   setting.Chart_Group = chartGroupIndex;
+   eaSettings[chartGroupIndex] = setting;
+   
+   // Attach the EA to the chart
+   // ...
+}
+
+//+------------------------------------------------------------------+
+//| Function to detach the EA from the chart                          |
+//+------------------------------------------------------------------+
+void DetachEA(const string symbol, const int chartGroupIndex)
+{
+   // Remove the EA settings from the array
+   EA_Settings setting;
+   setting.EA_Name = '';
+   setting.Chart_Group = 0;
+   eaSettings[chartGroupIndex] = setting;
+   
+   // Detach the EA from the chart
+   // ...
+}
+
+//+------------------------------------------------------------------+
+//| Function to get the chart group index based on the symbol         |
+//+------------------------------------------------------------------+
+int GetChartGroupIndex(const string symbol)
+{
+   // Get the chart group index based on the symbol
+   // ...
+}
+
